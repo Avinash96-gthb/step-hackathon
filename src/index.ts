@@ -6,6 +6,7 @@ import { createPlaylistRoutes } from './routes/playlists';
 import { createSongRoutes } from './routes/songs';
 import { createPlaybackRoutes } from './routes/playback';
 import { createDashboardRoutes } from './routes/dashboard';
+import { swaggerUi, specs } from './swagger';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,30 @@ app.use((req, res, next) => {
 });
 
 // Health check endpoint
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: healthy
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                 uptime:
+ *                   type: number
+ *                   description: Server uptime in seconds
+ */
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
@@ -32,6 +57,17 @@ app.get('/health', (req, res) => {
     uptime: process.uptime()
   });
 });
+
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs, {
+  explorer: true,
+  customSiteTitle: 'PlayWise API Documentation',
+  customfavIcon: '/favicon.ico',
+  customCss: '.swagger-ui .topbar { display: none }',
+  swaggerOptions: {
+    persistAuthorization: true,
+  }
+}));
 
 // Mount API routes with debug logging
 console.log('🔧 Mounting dashboard routes...');

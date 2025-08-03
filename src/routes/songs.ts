@@ -6,8 +6,50 @@ export function createSongRoutes(playWiseEngine: PlayWiseEngine): Router {
   const router = Router();
 
   /**
-   * POST /api/songs
-   * Add a new song to the system
+   * @swagger
+   * /api/songs:
+   *   post:
+   *     summary: Add a new song to the system
+   *     description: Adds a new song to the music library and optionally to the current playlist
+   *     tags: [Songs]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             allOf:
+   *               - $ref: '#/components/schemas/Song'
+   *               - type: object
+   *                 properties:
+   *                   addToPlaylist:
+   *                     type: boolean
+   *                     default: true
+   *                     description: Whether to add the song to the current playlist
+   *     responses:
+   *       201:
+   *         description: Song added successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: Song added successfully
+   *                 song:
+   *                   $ref: '#/components/schemas/Song'
+   *       400:
+   *         description: Bad request - missing required fields or song already exists
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.post('/', (req: Request, res: Response) => {
     try {
@@ -48,8 +90,66 @@ export function createSongRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * GET /api/songs/search
-   * Search songs with advanced criteria
+   * @swagger
+   * /api/songs/search:
+   *   get:
+   *     summary: Search songs with advanced criteria
+   *     description: Search for songs using multiple optional criteria such as title, artist, genre, and rating range
+   *     tags: [Songs]
+   *     parameters:
+   *       - in: query
+   *         name: title
+   *         schema:
+   *           type: string
+   *         description: Song title to search for (partial match)
+   *       - in: query
+   *         name: artist
+   *         schema:
+   *           type: string
+   *         description: Artist name to search for (partial match)
+   *       - in: query
+   *         name: genre
+   *         schema:
+   *           type: string
+   *         description: Music genre to filter by
+   *       - in: query
+   *         name: minRating
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 5
+   *         description: Minimum rating (1-5)
+   *       - in: query
+   *         name: maxRating
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 5
+   *         description: Maximum rating (1-5)
+   *     responses:
+   *       200:
+   *         description: Search results
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 results:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Song'
+   *                 count:
+   *                   type: integer
+   *                   description: Number of songs found
+   *                 criteria:
+   *                   type: object
+   *                   description: Applied search criteria
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/search', (req: Request, res: Response) => {
     try {
@@ -77,8 +177,38 @@ export function createSongRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * GET /api/songs/recommended
-   * Get recommended songs
+   * @swagger
+   * /api/songs/recommended:
+   *   get:
+   *     summary: Get recommended songs
+   *     description: Returns AI-powered song recommendations based on listening history and preferences
+   *     tags: [Songs]
+   *     parameters:
+   *       - in: query
+   *         name: limit
+   *         schema:
+   *           type: integer
+   *         description: Maximum number of recommendations to return
+   *     responses:
+   *       200:
+   *         description: Recommended songs
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 recommendations:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Song'
+   *                 count:
+   *                   type: number
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/recommended', (req: Request, res: Response) => {
     try {
@@ -98,8 +228,49 @@ export function createSongRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * GET /api/songs/rating/:rating
-   * Get songs by specific rating
+   * @swagger
+   * /api/songs/rating/{rating}:
+   *   get:
+   *     summary: Get songs by specific rating
+   *     description: Returns all songs with the specified rating value
+   *     tags: [Songs]
+   *     parameters:
+   *       - in: path
+   *         name: rating
+   *         required: true
+   *         schema:
+   *           type: number
+   *           minimum: 1
+   *           maximum: 5
+   *         description: Rating value (1-5)
+   *     responses:
+   *       200:
+   *         description: Songs with specified rating
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 songs:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Song'
+   *                 rating:
+   *                   type: number
+   *                 count:
+   *                   type: number
+   *       400:
+   *         description: Invalid rating value
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/rating/:rating', (req: Request, res: Response) => {
     try {
@@ -127,8 +298,38 @@ export function createSongRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * GET /api/songs/:id
-   * Get a specific song by ID
+   * @swagger
+   * /api/songs/{id}:
+   *   get:
+   *     summary: Get a specific song by ID
+   *     description: Returns detailed information about a specific song
+   *     tags: [Songs]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema:
+   *           type: string
+   *         description: Unique song identifier
+   *     responses:
+   *       200:
+   *         description: Song found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Song'
+   *       404:
+   *         description: Song not found
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/:id', (req: Request, res: Response) => {
     try {

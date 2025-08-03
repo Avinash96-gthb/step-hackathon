@@ -6,8 +6,48 @@ export function createPlaylistRoutes(playWiseEngine: PlayWiseEngine): Router {
   const router = Router();
 
   /**
-   * GET /api/playlists/current
-   * Get the current playlist
+   * @swagger
+   * /api/playlists/current:
+   *   get:
+   *     summary: Get the current playlist
+   *     description: Returns the current playlist with all songs and metadata
+   *     tags: [Playlists]
+   *     responses:
+   *       200:
+   *         description: Current playlist data
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 playlist:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/Song'
+   *                 info:
+   *                   type: object
+   *                   properties:
+   *                     id:
+   *                       type: string
+   *                     name:
+   *                       type: string
+   *                     songCount:
+   *                       type: integer
+   *                     createdAt:
+   *                       type: string
+   *                       format: date-time
+   *                     updatedAt:
+   *                       type: string
+   *                       format: date-time
+   *                 count:
+   *                   type: integer
+   *                   description: Total number of songs in playlist
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/current', (req: Request, res: Response) => {
     try {
@@ -28,8 +68,53 @@ export function createPlaylistRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * POST /api/playlists/songs
-   * Add a song to the current playlist
+   * @swagger
+   * /api/playlists/songs:
+   *   post:
+   *     summary: Add a song to the current playlist
+   *     description: Adds a song to the current playlist at the specified position or at the end
+   *     tags: [Playlists]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - songId
+   *             properties:
+   *               songId:
+   *                 type: string
+   *                 description: ID of the song to add
+   *               position:
+   *                 type: integer
+   *                 description: Position to insert the song (optional, defaults to end)
+   *     responses:
+   *       200:
+   *         description: Song added successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 playlistLength:
+   *                   type: number
+   *       400:
+   *         description: Invalid request
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.post('/songs', (req: Request, res: Response) => {
     try {
@@ -63,8 +148,54 @@ export function createPlaylistRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * DELETE /api/playlists/songs/:index
-   * Remove a song from playlist by index
+   * @swagger
+   * /api/playlists/songs/{index}:
+   *   delete:
+   *     summary: Remove a song from playlist by index
+   *     description: Removes a song from the current playlist at the specified index position
+   *     tags: [Playlists]
+   *     parameters:
+   *       - in: path
+   *         name: index
+   *         required: true
+   *         schema:
+   *           type: integer
+   *           minimum: 0
+   *         description: Index position of the song to remove
+   *     responses:
+   *       200:
+   *         description: Song removed successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 removedSong:
+   *                   $ref: '#/components/schemas/Song'
+   *                 playlistLength:
+   *                   type: number
+   *       400:
+   *         description: Invalid index
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       404:
+   *         description: Song not found at index
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.delete('/songs/:index', (req: Request, res: Response) => {
     try {
@@ -98,8 +229,58 @@ export function createPlaylistRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * PUT /api/playlists/songs/move
-   * Move a song within the playlist
+   * @swagger
+   * /api/playlists/songs/move:
+   *   put:
+   *     summary: Move a song within the playlist
+   *     description: Changes the position of a song within the current playlist
+   *     tags: [Playlists]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - fromIndex
+   *               - toIndex
+   *             properties:
+   *               fromIndex:
+   *                 type: integer
+   *                 minimum: 0
+   *                 description: Current index of the song
+   *               toIndex:
+   *                 type: integer
+   *                 minimum: 0
+   *                 description: New index position for the song
+   *     responses:
+   *       200:
+   *         description: Song moved successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 fromIndex:
+   *                   type: integer
+   *                 toIndex:
+   *                   type: integer
+   *       400:
+   *         description: Invalid indices
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.put('/songs/move', (req: Request, res: Response) => {
     try {
@@ -133,8 +314,29 @@ export function createPlaylistRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * PUT /api/playlists/reverse
-   * Reverse the entire playlist
+   * @swagger
+   * /api/playlists/reverse:
+   *   put:
+   *     summary: Reverse the entire playlist
+   *     description: Reverses the order of all songs in the current playlist
+   *     tags: [Playlists]
+   *     responses:
+   *       200:
+   *         description: Playlist reversed successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: Playlist reversed successfully
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.put('/reverse', (req: Request, res: Response) => {
     try {

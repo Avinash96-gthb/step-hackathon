@@ -5,8 +5,58 @@ export function createPlaybackRoutes(playWiseEngine: PlayWiseEngine): Router {
   const router = Router();
 
   /**
-   * POST /api/playback/play
-   * Play a specific song
+   * @swagger
+   * /api/playback/play:
+   *   post:
+   *     summary: Play a specific song
+   *     description: Starts playing a specific song by ID and updates playback history
+   *     tags: [Playback]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - songId
+   *             properties:
+   *               songId:
+   *                 type: string
+   *                 description: ID of the song to play
+   *                 example: song1
+   *     responses:
+   *       200:
+   *         description: Song started playing successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 message:
+   *                   type: string
+   *                   example: Song started playing
+   *                 currentSong:
+   *                   $ref: '#/components/schemas/Song'
+   *                 isPlaying:
+   *                   type: boolean
+   *       400:
+   *         description: Bad request - songId missing
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       404:
+   *         description: Song not found or failed to play
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.post('/play', (req: Request, res: Response) => {
     try {
@@ -41,8 +91,52 @@ export function createPlaybackRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * POST /api/playback/skip
-   * Skip the current song
+   * @swagger
+   * /api/playback/skip:
+   *   post:
+   *     summary: Skip the current song
+   *     description: Skips the specified song and moves to the next track in the playlist
+   *     tags: [Playback]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - songId
+   *             properties:
+   *               songId:
+   *                 type: string
+   *                 description: ID of the song to skip
+   *     responses:
+   *       200:
+   *         description: Song skipped successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                 message:
+   *                   type: string
+   *                 skippedSong:
+   *                   type: string
+   *                 currentSong:
+   *                   $ref: '#/components/schemas/Song'
+   *       400:
+   *         description: Invalid request
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
+   *       500:
+   *         description: Server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.post('/skip', (req: Request, res: Response) => {
     try {
@@ -169,8 +263,43 @@ export function createPlaybackRoutes(playWiseEngine: PlayWiseEngine): Router {
   });
 
   /**
-   * GET /api/playback/status
-   * Get current playback status
+   * @swagger
+   * /api/playback/status:
+   *   get:
+   *     summary: Get current playback status
+   *     description: Returns the current playback state including currently playing song and system status
+   *     tags: [Playback]
+   *     responses:
+   *       200:
+   *         description: Current playback status
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 currentSong:
+   *                   anyOf:
+   *                     - $ref: '#/components/schemas/Song'
+   *                     - type: 'null'
+   *                   description: Currently playing song or null if nothing is playing
+   *                 isPlaying:
+   *                   type: boolean
+   *                   description: Whether a song is currently playing
+   *                 isAutoReplay:
+   *                   type: boolean
+   *                   description: Whether auto-replay mode is active
+   *                 playlistSize:
+   *                   type: integer
+   *                   description: Total number of songs in current playlist
+   *                 historySize:
+   *                   type: integer
+   *                   description: Number of songs in playback history
+   *       500:
+   *         description: Internal server error
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Error'
    */
   router.get('/status', (req: Request, res: Response) => {
     try {
