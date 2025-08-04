@@ -89,8 +89,52 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * POST /api/playback/skip
-     * Skip the current song
+     * @swagger
+     * /api/playback/skip:
+     *   post:
+     *     summary: Skip the current song
+     *     description: Skips the specified song and moves to the next track in the playlist
+     *     tags: [Playback]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - songId
+     *             properties:
+     *               songId:
+     *                 type: string
+     *                 description: ID of the song to skip
+     *     responses:
+     *       200:
+     *         description: Song skipped successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                 message:
+     *                   type: string
+     *                 skippedSong:
+     *                   type: string
+     *                 currentSong:
+     *                   $ref: '#/components/schemas/Song'
+     *       400:
+     *         description: Invalid request
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.post('/skip', (req, res) => {
         try {
@@ -123,8 +167,39 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * POST /api/playback/next
-     * Play next song in playlist
+     * @swagger
+     * /api/playback/next:
+     *   post:
+     *     summary: Play next song in playlist
+     *     description: Advances to the next song in the current playlist
+     *     tags: [Playback]
+     *     responses:
+     *       200:
+     *         description: Next song started successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Playing next song
+     *                 currentSong:
+     *                   $ref: '#/components/schemas/Song'
+     *                 hasNext:
+     *                   type: boolean
+     *       404:
+     *         description: No next song available
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.post('/next', (req, res) => {
         try {
@@ -155,8 +230,39 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * POST /api/playback/previous
-     * Play previous song in playlist
+     * @swagger
+     * /api/playback/previous:
+     *   post:
+     *     summary: Play previous song in playlist
+     *     description: Goes back to the previous song in the current playlist
+     *     tags: [Playback]
+     *     responses:
+     *       200:
+     *         description: Previous song started successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Playing previous song
+     *                 currentSong:
+     *                   $ref: '#/components/schemas/Song'
+     *                 hasPrevious:
+     *                   type: boolean
+     *       404:
+     *         description: No previous song available
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.post('/previous', (req, res) => {
         try {
@@ -185,8 +291,41 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * POST /api/playback/undo
-     * Undo last play operation
+     * @swagger
+     * /api/playback/undo:
+     *   post:
+     *     summary: Undo last play operation
+     *     description: Undoes the last playback action using the playback history stack
+     *     tags: [Playback]
+     *     responses:
+     *       200:
+     *         description: Undo operation successful
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Undo successful
+     *                 previousSong:
+     *                   $ref: '#/components/schemas/Song'
+     *                 currentSong:
+     *                   $ref: '#/components/schemas/Song'
+     *                 historySize:
+     *                   type: number
+     *       404:
+     *         description: No action to undo
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.post('/undo', (req, res) => {
         try {
@@ -272,8 +411,38 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * GET /api/playback/history
-     * Get playback history
+     * @swagger
+     * /api/playback/history:
+     *   get:
+     *     summary: Get playback history
+     *     description: Returns the list of previously played songs from the playback history stack
+     *     tags: [Playback]
+     *     parameters:
+     *       - in: query
+     *         name: limit
+     *         schema:
+     *           type: integer
+     *         description: Maximum number of history entries to return
+     *     responses:
+     *       200:
+     *         description: Playback history retrieved
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 history:
+     *                   type: array
+     *                   items:
+     *                     $ref: '#/components/schemas/Song'
+     *                 count:
+     *                   type: number
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.get('/history', (req, res) => {
         try {
@@ -292,8 +461,33 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * POST /api/playback/auto-replay
-     * Start auto-replay mode
+     * @swagger
+     * /api/playback/auto-replay:
+     *   post:
+     *     summary: Start auto-replay mode
+     *     description: Enables automatic song replay based on calming genres and user preferences
+     *     tags: [Playback]
+     *     responses:
+     *       200:
+     *         description: Auto-replay mode started successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Auto-replay mode started
+     *                 currentSong:
+     *                   $ref: '#/components/schemas/Song'
+     *                 autoReplayEnabled:
+     *                   type: boolean
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.post('/auto-replay', (req, res) => {
         try {
@@ -321,8 +515,58 @@ function createPlaybackRoutes(playWiseEngine) {
         }
     });
     /**
-     * PUT /api/playback/auto-replay/config
-     * Update auto-replay configuration
+     * @swagger
+     * /api/playback/auto-replay/config:
+     *   put:
+     *     summary: Update auto-replay configuration
+     *     description: Configures auto-replay settings including calming genres and song count preferences
+     *     tags: [Playback]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               enabled:
+     *                 type: boolean
+     *                 description: Enable/disable auto-replay mode
+     *               calmingGenres:
+     *                 type: array
+     *                 items:
+     *                   type: string
+     *                 description: List of genres considered calming for auto-replay
+     *               topSongsCount:
+     *                 type: integer
+     *                 description: Number of top songs to consider for auto-replay
+     *     responses:
+     *       200:
+     *         description: Auto-replay configuration updated
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Auto-replay configuration updated
+     *                 config:
+     *                   type: object
+     *                   properties:
+     *                     enabled:
+     *                       type: boolean
+     *                     calmingGenres:
+     *                       type: array
+     *                       items:
+     *                         type: string
+     *                     topSongsCount:
+     *                       type: integer
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.put('/auto-replay/config', (req, res) => {
         try {

@@ -306,8 +306,29 @@ function createPlaylistRoutes(playWiseEngine) {
         }
     });
     /**
-     * PUT /api/playlists/reverse
-     * Reverse the entire playlist
+     * @swagger
+     * /api/playlists/reverse:
+     *   put:
+     *     summary: Reverse the entire playlist
+     *     description: Reverses the order of all songs in the current playlist
+     *     tags: [Playlists]
+     *     responses:
+     *       200:
+     *         description: Playlist reversed successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Playlist reversed successfully
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.put('/reverse', (req, res) => {
         try {
@@ -324,8 +345,69 @@ function createPlaylistRoutes(playWiseEngine) {
         }
     });
     /**
-     * PUT /api/playlists/sort
-     * Sort the playlist by criteria
+     * @swagger
+     * /api/playlists/sort:
+     *   put:
+     *     summary: Sort the playlist by criteria
+     *     description: Sorts the current playlist using specified field, order, and sorting algorithm
+     *     tags: [Playlists]
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - field
+     *               - order
+     *             properties:
+     *               field:
+     *                 type: string
+     *                 enum: [title, duration, dateAdded, playCount, rating]
+     *                 description: Field to sort by
+     *               order:
+     *                 type: string
+     *                 enum: [asc, desc]
+     *                 description: Sort order (ascending or descending)
+     *               algorithm:
+     *                 type: string
+     *                 enum: [merge, quick, heap]
+     *                 description: Sorting algorithm to use (optional, defaults to merge)
+     *     responses:
+     *       200:
+     *         description: Playlist sorted successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 success:
+     *                   type: boolean
+     *                 message:
+     *                   type: string
+     *                 sortedBy:
+     *                   type: object
+     *                   properties:
+     *                     field:
+     *                       type: string
+     *                     order:
+     *                       type: string
+     *                     algorithm:
+     *                       type: string
+     *                 playlistLength:
+     *                   type: number
+     *       400:
+     *         description: Invalid sort parameters
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.put('/sort', (req, res) => {
         try {
@@ -367,8 +449,34 @@ function createPlaylistRoutes(playWiseEngine) {
         }
     });
     /**
-     * PUT /api/playlists/shuffle
-     * Shuffle the playlist randomly
+     * @swagger
+     * /api/playlists/shuffle:
+     *   put:
+     *     summary: Shuffle the playlist randomly
+     *     description: Randomly shuffles all songs in the current playlist using Fisher-Yates algorithm
+     *     tags: [Playlists]
+     *     responses:
+     *       200:
+     *         description: Playlist shuffled successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Playlist shuffled successfully
+     *                 playlistLength:
+     *                   type: number
+     *                 algorithm:
+     *                   type: string
+     *                   example: Fisher-Yates
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.put('/shuffle', (req, res) => {
         try {
@@ -392,8 +500,29 @@ function createPlaylistRoutes(playWiseEngine) {
         }
     });
     /**
-     * DELETE /api/playlists/clear
-     * Clear the entire playlist
+     * @swagger
+     * /api/playlists/clear:
+     *   delete:
+     *     summary: Clear the entire playlist
+     *     description: Removes all songs from the current playlist
+     *     tags: [Playlists]
+     *     responses:
+     *       200:
+     *         description: Playlist cleared successfully
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: Playlist cleared successfully
+     *       500:
+     *         description: Server error
+     *         content:
+     *           application/json:
+     *             schema:
+     *               $ref: '#/components/schemas/Error'
      */
     router.delete('/clear', (req, res) => {
         try {
